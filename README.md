@@ -36,4 +36,3 @@ Best ways to interact through command line or through blockchain explorer and de
 - Contract Address: 0x4A24479934de70b1B066889D0f78df29cc97Ba5b
 - Transaction Hash: 0x5b8445437c3252571864cff84ad6fe6e291940dd7a839dd5de45798889c8a40f
 - Block Explorer: https://mumbai.polygonscan.com/tx/0x94527db739bbad2293e45e3aa2779394f7c96c2c27a22bdaf551f94a3ab6aa61
-- 
