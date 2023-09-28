@@ -7,33 +7,57 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract TokenZ is ERC20, Ownable {
-  using SafeMath for uint256;
+ using SafeMath for uint256;
 
-  IERC20 public tokenY;
-  mapping(address => uint256) public tokenYBalance;
+ IERC20 public tokenY;
+ mapping(address => uint256) public tokenYBalance;
+ bool public paused;
 
-  constructor(address _tokenY) ERC20("Token Z", "TZ") {
-    tokenY = IERC20(_tokenY);
-  }
+ constructor(address _tokenY) ERC20("Token Z", "TZ") {
+  tokenY = IERC20(_tokenY);
+  paused = false;
+ }
 
-  // Function to deposit Token Y and receive Token Z
-  function depositTokenY(uint256 _amount) external onlyOwner {
-    require(_amount > 0, "Amount must be greater than 0");
-    require(tokenY.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
+ modifier whenNotPaused() {
+  require(!paused, "Contract is paused");
+  _;
+ }
 
-    uint256 mintAmount = (_amount * 100) / totalTokenYBalance();
-    _mint(msg.sender, mintAmount);
-    tokenYBalance[msg.sender] += _amount;
+ // Function to deposit Token Y and receive Token Z
+ function depositTokenY(uint256 _amount) external onlyOwner whenNotPaused {
+  require(_amount > 0, "Amount must be greater than 0");
+  require(tokenY.balanceOf(msg.sender) >= _amount, "User does not have enough Token Y");
+  require(tokenY.transferFrom(msg.sender, address(this), _amount), "Transfer failed");
 
-    // Emit an event to track token deposits
-    emit TokenYDeposited(msg.sender, _amount);
-  }
+  uint256 mintAmount;
+  if (totalTokenYBalance() > 0) {
+   mintAmount = (_amount * 100) / totalTokenYBalance();
+  } else {
+   // Handle the case where the total balance of Token Y in the contract is zero
+  }
 
-  // Function to calculate the total Token Y balance in the contract
-  function totalTokenYBalance() public view returns (uint256) {
-    return tokenY.balanceOf(address(this));
-  }
+  _mint(msg.sender, mintAmount);
+  tokenYBalance[msg.sender] += _amount;
 
-  // Event to track token deposits
-  event TokenYDeposited(address indexed sender, uint256 amount);
+  // Emit an event to track token deposits
+  emit TokenYDeposited(msg.sender, _amount);
+ }
+
+ // Function to calculate the total Token Y balance in the contract
+ function totalTokenYBalance() public view returns (uint256) {
+  return tokenY.balanceOf(address(this));
+ }
+
+ // Function to pause the contract
+ function pause() external onlyOwner {
+  paused = true;
+ }
+
+ // Function to unpause the contract
+ function unpause() external onlyOwner {
+  paused = false;
+ }
+
+ // Event to track token deposits
+ event TokenYDeposited(address indexed sender, uint256 amount);
 }
