@@ -12,18 +12,13 @@ contract TokenY is ERC20, Ownable {
   constructor() ERC20("Token Y", "TY") {
     // Mint initial supply to the deployer
     // Minting 1000 tokens with 18 decimals
-    _mintTo(msg.sender, 1000 * 10**18);
-  }
-
-  // Custom function to mint new tokens (onlyOwner)
-  function _mintTo(address to, uint256 amount) internal onlyOwner {
-    require(to != address(0), "TokenY: mint to the zero address");
-    _mint(to, amount);
+    _mint(msg.sender, 1000 * 10**18);
   }
 
   // Function to mint new tokens (onlyOwner)
   function mint(address to, uint256 amount) external onlyOwner {
-    _mintTo(to, amount);
+    require(to != address(0), "TokenY: mint to the zero address");
+    _mint(to, amount);
     emit TokenMinted(to, amount);
   }
 }
